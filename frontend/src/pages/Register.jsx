@@ -152,7 +152,12 @@ function Register() {
 
                         {/* Submit */}
                         <div className="mt-7 mb-5 w-full flex justify-end">
-                            <button className={buttonClass}>Sign Up</button>
+                            <button
+                                type="submit"
+                                className={buttonClass}
+                            >
+                                Sign Up
+                            </button>
                         </div>
                     </form>
                 </div>

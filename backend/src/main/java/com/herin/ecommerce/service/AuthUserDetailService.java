@@ -23,7 +23,7 @@ public class AuthUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
         UserEntity user = (UserEntity) userRepository.findByUsernameOrEmail(identifier,identifier)
-                .orElseThrow(() -> new BadRequestException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new UserPrincipal(user);
     }
 }

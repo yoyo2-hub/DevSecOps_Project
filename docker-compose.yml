@@ -1,35 +1,43 @@
+version: "3.8"
+
 services:
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
-    env_file:
-      - .env.docker
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/ecommerce_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      # Must be >= 32 bytes for HS256 (jjwt requirement)
+      JWT_SECRET: mysupersecret123mysupersecret123
+      JWT_EXPIRATION: 86400000
+      STRIPE_SECRET_KEY: REMOVED_SECRET51TK25434EzZqLz8RulAWknOOmubWayB4LLd724UuM9s2J5lAxLMnJkkR6Xj2wvTH0zVh4PiW5AWN7nbhQdtffPGM00o3L495WD
     depends_on:
       - db
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:80"
-    env_file:
-      - .env.docker
     depends_on:
       - backend
-
-  db:
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ecommerce_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:

@@ -5,12 +5,9 @@ import com.herin.ecommerce.dto.UserDTO.UserRequestDTO;
 import com.herin.ecommerce.dto.UserDTO.UserResponseDTO;
 import com.herin.ecommerce.exception.BadRequestException;
 import com.herin.ecommerce.model.UserEntity;
-import com.herin.ecommerce.model.UserPrincipal;
 import com.herin.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -85,26 +82,17 @@ public class AuthService {
      * @throws BadRequestException if authentication fails
      */
     public String login(LoginRequestDTO loginRequestDTO) {
-        try {
-            // Authenticate the user using the authentication manager
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequestDTO.getIdentifier(),
-                            loginRequestDTO.getPassword()
-                    )
-            );
+        UserEntity user = userRepository
+                .findByUsernameOrEmail(loginRequestDTO.getIdentifier(), loginRequestDTO.getIdentifier())
+                .orElseThrow(() -> new BadRequestException("Invalid username or password"));
 
-            // Check if the authentication was successful
-            UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
-            UserEntity user = principal.getUser();
-
-            return jwtService.generateToken(user.getUsername());
-
-        }
-        catch (Exception e) {
+        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
             throw new BadRequestException("Invalid username or password");
         }
-    }
+
+        // Keep JWT subject consistent with UserDetails.getUsername() (username).
+        return jwtService.generateToken(user.getUsername());
+}
 
 
 

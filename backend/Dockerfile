@@ -1,18 +1,18 @@
-# Use lightweight OpenJDK base image
-FROM openjdk:17-jdk-alpine
+FROM maven:3.9-eclipse-temurin-17-alpine AS build
 
-# Set working directory inside the container
 WORKDIR /app
 
+COPY pom.xml .
+COPY src ./src
 
-# Copy the built jar from host to container
-COPY target/*.jar app.jar
+RUN mvn -q -DskipTests package
 
-# Expose the port your Spring Boot app runs on
-EXPOSE 8082
+FROM eclipse-temurin:17-jdk-alpine
 
-# Define environment variables for Spring Boot
-ENV SPRING_PROFILES_ACTIVE=prod
+WORKDIR /app
 
-# Start the application with environment-aware config
-ENTRYPOINT ["java", "-jar", "app.jar"]
+RUN apk add --no-cache bash netcat-openbsd
+
+COPY --from=build /app/target/*.jar /app/app.jar
+
+ENTRYPOINT ["sh","-c","until nc -z db 5432; do echo waiting for db; sleep 2; done; java -jar /app/app.jar"]

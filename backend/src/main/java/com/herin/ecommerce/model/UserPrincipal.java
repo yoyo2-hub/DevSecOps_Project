@@ -13,6 +13,7 @@ public class UserPrincipal implements UserDetails {
     public UserPrincipal(UserEntity user) {
         this.user = user;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -51,5 +52,4 @@ public class UserPrincipal implements UserDetails {
     public UserEntity getUser() {
         return this.user;
     }
-
 }
