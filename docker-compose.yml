@@ -24,9 +24,11 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       # Must be >= 32 bytes for HS256 (jjwt requirement)
-      JWT_SECRET: mysupersecret123mysupersecret123
+      
       JWT_EXPIRATION: 86400000
-      STRIPE_SECRET_KEY: sk_test # REMOVED_SECRET51TK25434EzZqLz8RulAWknOOmubWayB4LLd724UuM9s2J5lAxLMnJkkR6Xj2wvTH0zVh4PiW5AWN7nbhQdtffPGM00o3L495WD
+      
+      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
     depends_on:
       - db
 
