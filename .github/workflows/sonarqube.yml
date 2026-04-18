@@ -3,7 +3,8 @@ name: SonarQube Scan
 on:
   push:
     branches:
-      - '**'
+      #- '**'
+      - 'ABDOU'
 
 jobs:
   scan:
