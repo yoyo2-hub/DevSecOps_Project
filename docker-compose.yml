@@ -24,11 +24,9 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       # Must be >= 32 bytes for HS256 (jjwt requirement)
-      
       JWT_EXPIRATION: 86400000
-      
-      JWT_SECRET: ${JWT_SECRET}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      JWT_SECRET: your-super-secret-key-at-least-32-bytes-long-for-hs256-algorithm
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_placeholder}
     depends_on:
       - db
 
