@@ -7,7 +7,13 @@ spec:
   selector:
     app: devsecops-app
   ports:
-  - protocol: TCP
+  - name: frontend
+    protocol: TCP
     port: 80
-    targetPort: 8080
+    targetPort: 80
     nodePort: 30080
+  - name: backend
+    protocol: TCP
+    port: 8082
+    targetPort: 8082
+    nodePort: 30082

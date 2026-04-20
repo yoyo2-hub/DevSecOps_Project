@@ -5,7 +5,7 @@ metadata:
   labels:
     app: devsecops-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: devsecops-app
@@ -15,11 +15,55 @@ spec:
         app: devsecops-app
     spec:
       containers:
-      - name: devsecops-app
-        image: TON_USERNAME/devsecops-app:latest
-        imagePullPolicy: Always
+
+      - name: backend
+        image: kammounab/devsecops-backend:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8082
+        env:
+        - name: DB_URL
+          value: "jdbc:postgresql://localhost:5432/ecommerce_db"
+        - name: DB_USERNAME
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "postgres"
+        - name: JWT_SECRET
+          value: "your-super-secret-key-at-least-32-bytes-long-for-hs256-algorithm"
+        - name: JWT_EXPIRATION
+          value: "86400000"
+        - name: STRIPE_SECRET_KEY
+          value: "sk_test_placeholder"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+      - name: frontend
+        image: kammounab/devsecops-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+      - name: db
+        image: postgres:15
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "ecommerce_db"
         resources:
           requests:
             memory: "256Mi"
