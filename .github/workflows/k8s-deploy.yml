@@ -5,6 +5,12 @@ on:
     branches:
       - dev
       - master
+      - emna
+
+  pull_request:
+    branches:
+      - dev
+      - master  
 
 jobs:
   deploy:
@@ -20,11 +26,20 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build Docker image
-      working-directory: backend
+    - name: Build and push backend
       run: |
-        docker build -t kammounab/devsecops-app:latest .
-        docker push kammounab/devsecops-app:latest
+        docker build -t kammounab/devsecops-backend:latest ./backend
+        docker push kammounab/devsecops-backend:latest
+
+    - name: Build and push frontend
+      run: |
+        docker build -t kammounab/devsecops-frontend:latest ./frontend
+        docker push kammounab/devsecops-frontend:latest
+
+    - name: Build and push ml_backend
+      run: |
+        docker build -t kammounab/devsecops-ml:latest ./ml_backend
+        docker push kammounab/devsecops-ml:latest
 
     - name: Setup Minikube
       uses: medyagh/setup-minikube@latest
@@ -39,8 +54,14 @@ jobs:
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
 
+    - name: Wait for pods to be ready
+      run: |
+        kubectl wait --for=condition=ready pod \
+          -l app=devsecops-app \
+          --timeout=300s
+
     - name: Verify app running
       run: |
-        kubectl rollout status deployment/devsecops-app --timeout=120s
+        kubectl rollout status deployment/devsecops-app --timeout=300s
         kubectl get pods
         kubectl get services
